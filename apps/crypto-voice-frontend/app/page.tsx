@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,6 @@ import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { ArrowRight, Loader2, Chrome } from "lucide-react";
 import { useWeb3Auth } from "@/hooks/useWeb3Auth";
-import { CHAINS } from "@/lib/wagmi/chains";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/spinner";
 
@@ -22,7 +21,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { initialize, login, isConnected, isLoggingIn, isInitializing } = useWeb3Auth({ chain: CHAINS[0] });
+  const { login, isConnected, status } = useWeb3Auth();
   const router = useRouter();
 
   const form = useForm<LoginFormValues>({
@@ -36,17 +35,11 @@ export default function LoginPage() {
     if (isConnected) {
       router.push("/dashboard");
     }
-  }, [isConnected]);
-
-  useEffect(() => {
-    const run = async () => {
-      await initialize();
-    }
-    run();
-  }, []);
+  }, [isConnected, router]);
 
   async function onSubmit(data: LoginFormValues) {
-    if (isLoggingIn) return;
+    if (status === 'initializing') return;
+    
     try {
       switch (data.provider) {
         case "google":
@@ -69,14 +62,14 @@ export default function LoginPage() {
     onSubmit({ provider });
   };
 
-  const isLoading = isInitializing || isLoggingIn;
+  const isLoading = status === 'initializing';
 
-  if (isInitializing) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-screen">
         <Spinner />
       </div>
-    )
+    );
   }
 
   return (

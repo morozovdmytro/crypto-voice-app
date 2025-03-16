@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PaymasterMode, Transaction } from '@biconomy/account';
 import { useGeneralStore } from '@/lib/store/general';
+import { useSmartAccount } from './useSmartAccount';
 
 export type BatchTransactionProps = {
   onStarted?: () => void;
@@ -14,7 +15,6 @@ export const useBatchTransactions = ({
   onError,
 }: BatchTransactionProps) => {
   const { smartAccount, signer, address } = useSmartAccount();
-  const investor = useGeneralStore(s => s.investor);
   const [isPending, setIsPending] = useState(false);
 
   const execute = async (txs: Transaction[], action?: string) => {
@@ -26,18 +26,10 @@ export const useBatchTransactions = ({
 
       const userOpResponse = await smartAccount?.sendTransaction(txs, {
         paymasterServiceData: {
-          mode: PaymasterMode.SPONSORED,
-          webhookData: {
-            platform: 'CROWDEX',
-            userId: investor?.id,
-            action,
-            recipient: txs[0]?.to,
-            walletAddress: address,
-          },
+          mode: PaymasterMode.SPONSORED
         },
       });
       const { transactionHash } = await userOpResponse.waitForTxHash();
-      console.log('Transaction Hash:', transactionHash);
       await userOpResponse.wait();
       setIsPending(false);
       onSuccess?.(transactionHash);
