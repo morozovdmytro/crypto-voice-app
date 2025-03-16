@@ -25,8 +25,7 @@ export class LivekitInitializer implements Initializer {
         // Use import.meta.url to get the current file's path in ES modules
         const currentFilePath = fileURLToPath(import.meta.url);
         const currentDirPath = dirname(currentFilePath);
-        const agentPath = path.resolve(currentDirPath, '../agents/livekit-agent.js');
-        this.logger.log(`Agent path: ${agentPath}`);
+        const agentPath = path.resolve(currentDirPath, './livekit-agent.js');
 
         this.worker = new Worker(new WorkerOptions({
             agent: agentPath,
@@ -37,7 +36,7 @@ export class LivekitInitializer implements Initializer {
         }));
 
         this.worker.event.once('worker_msg', (msg) => {
-            this.logger.log(`worker_msg: ${msg}`);
+            this.logger.debug(`worker_msg: ${msg}`);
         });
 
         await this.worker.run();

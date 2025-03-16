@@ -16,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${manrope400.className}`}>
       <body className="h-full">
-        <Providers>{children}</Providers>
+        <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 p-4">
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   );
