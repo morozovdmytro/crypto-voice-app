@@ -1,0 +1,1 @@
+export const ROOM_MANAGER_TOKEN = 'ROOM_MANAGER'; 
