@@ -1,0 +1,6 @@
+.github/
+dist/
+docs/
+node_modules/
+.next/
+yarn.lock
