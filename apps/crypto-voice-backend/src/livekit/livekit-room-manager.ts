@@ -9,7 +9,7 @@ export class LivekitRoomManager implements RoomManager {
 
     constructor(private readonly configService: ConfigService) { }
 
-    async createRoom(roomId: string, userId: string): Promise<Room> {
+    async createRoom(roomId: string, userId: string, userInfo?: Record<string, any>): Promise<Room> {
         this.logger.log(`Creating room ${roomId} for user ${userId}`);
         try {
             const roomClient = this.getRoomClient();
@@ -22,7 +22,19 @@ export class LivekitRoomManager implements RoomManager {
                 identity: userId,
                 ttl: roomTtl ?? '1h',
             });
-            token.addGrant({ roomJoin: true, room: roomId });
+            
+            // Add user metadata if provided
+            if (userInfo) {
+                this.logger.log(`Adding user metadata: ${JSON.stringify(userInfo)}`);
+                token.metadata = JSON.stringify(userInfo);
+            }
+            
+            token.addGrant({ 
+                roomJoin: true, 
+                room: roomId,
+                canUpdateOwnMetadata: true 
+            });
+            
             this.logger.log(`Created token`);
             
             const accessToken = await token.toJwt();

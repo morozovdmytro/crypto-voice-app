@@ -8,10 +8,23 @@ import { Room as RoomType } from "../types/room";
 import VoiceAssistantBars from "@/components/VoiceAssistantBars";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
 import ControlBar from "@/components/ControlBar";
+import { useUserData } from "@/hooks/useUserData";
+import Spinner from "./ui/spinner";
+import useSmartContracts from "@/hooks/useSmartContracts";
+import { useBalanceOf } from "@/hooks/useBalanceOf";
+import { formatTokenAmount } from "@/lib/numbers.utils";
 
-const VoiceAssistant = () => {
+const VoiceAssistant = ({ userId }: { userId: string }) => {
     const [connectionDetails, setConnectionDetails] = useState<RoomType | undefined>();
     const [agentState, setAgentState] = useState<AgentState>("disconnected");
+    const { userData, status } = useUserData();
+    const { smartContract } = useSmartContracts();
+    const { balance, loading: isBalanceLoading } = useBalanceOf(smartContract.address as `0x${string}`);
+
+    const userInfo = {
+        name: userData?.name,
+        balance: balance ? `${formatTokenAmount(balance)} ${smartContract.ticker}` : `0 ${smartContract.ticker}`
+    };
 
     const onDeviceFailure = useCallback((failure?: MediaDeviceFailure) => {
         if (failure) {
@@ -27,12 +40,19 @@ const VoiceAssistant = () => {
         updateConnectionDetails(room);
     };
 
+    const isLoading = status !== 'ready' && status !== 'error' || isBalanceLoading;
+
     return (
         <div className="flex h-[500px] flex-col">
-            {!connectionDetails ? (
+            {isLoading ? (
+                <div className="flex justify-center p-8">
+                    <Spinner />
+                </div>
+            ) : !connectionDetails ? (
                 <div className="flex justify-center p-8">
                     <CreateRoomButton
-                        userId="user-123" // Replace with actual user ID
+                        userId={userId}
+                        userInfo={userInfo}
                         onRoomCreated={handleRoomCreated}
                     />
                 </div>

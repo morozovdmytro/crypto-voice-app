@@ -4,10 +4,11 @@ import { Room } from '../types/room';
 
 interface CreateRoomButtonProps {
   userId: string;
+  userInfo?: Record<string, any>;
   onRoomCreated?: (room: Room) => void;
 }
 
-export function CreateRoomButton({ userId, onRoomCreated }: CreateRoomButtonProps) {
+export function CreateRoomButton({ userId, userInfo, onRoomCreated }: CreateRoomButtonProps) {
   const [createdRoom, setCreatedRoom] = useState<Room | null>(null);
 
   const { mutate: createRoom, isPending, isError, error } = useRoomCreation({
@@ -20,7 +21,7 @@ export function CreateRoomButton({ userId, onRoomCreated }: CreateRoomButtonProp
   });
 
   const handleCreateRoom = () => {
-    createRoom({ userId });
+    createRoom({ userId, userInfo });
   };
 
   return (

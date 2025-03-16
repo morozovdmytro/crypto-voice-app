@@ -6,4 +6,5 @@ export interface Room {
 
 export interface CreateRoomRequest {
   userId: string;
+  userInfo?: Record<string, any>;
 } 

@@ -1,4 +1,3 @@
-
 export interface Room {
     accessToken: string;
     serverUrl: string;
@@ -6,6 +5,6 @@ export interface Room {
 }
 
 export interface RoomManager {
-    createRoom(roomId: string, userId: string): Promise<Room>;
+    createRoom(roomId: string, userId: string, userInfo?: Record<string, any>): Promise<Room>;
     deleteRoom(roomId: string): Promise<void>;
 }

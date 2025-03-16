@@ -1,5 +1,6 @@
 import { JobContext, llm, multimodal, defineAgent } from "@livekit/agents";
 import * as openai from '@livekit/agents-plugin-openai';
+import { OPENAI_INSTRUCTIONS, OPENAI_MODEL, OPENAI_TEMPERATURE, OPENAI_VOICE } from "../constants.js";
 
 export default defineAgent({
     entry: async (ctx: JobContext) => {
@@ -16,10 +17,28 @@ export default defineAgent({
 
             console.log('Waiting for participant');
             const participant = await ctx.waitForParticipant();
+            
+            // Access participant metadata and attributes
+            const participantMetadata = participant.metadata;
+            const participantAttributes = participant.attributes;
+            
+            console.log('Participant metadata:', participantMetadata);
+            console.log('Participant attributes:', participantAttributes);
+            
+            // Parse user information from metadata if it exists
+            let userInfo = {};
+            if (participantMetadata) {
+                try {
+                    userInfo = JSON.parse(participantMetadata);
+                    console.log('Parsed user info:', userInfo);
+                } catch (error) {
+                    console.error('Error parsing participant metadata:', error);
+                }
+            }
 
             console.log('Creating model');
             const model = new openai.realtime.RealtimeModel({
-                instructions: 'You are a helpful assistant.',
+                instructions: OPENAI_INSTRUCTIONS,
                 apiKey: openaiApiKey,
             });
 
@@ -36,11 +55,19 @@ export default defineAgent({
                 .start(ctx.room, participant)
                 .then((session) => session as openai.realtime.RealtimeSession);
 
+            // Create a greeting message that includes user information if available
+            let greetingText = 'Say "How can I help you today?"';
+            
+            // If we have user information, include it in the greeting
+            if (Object.keys(userInfo).length > 0) {
+                greetingText = `The user's information is: ${JSON.stringify(userInfo)}. Greet them by name if available and ask how you can help them today.`;
+            }
+
             console.log('Sending message to agent');
             session.conversation.item.create(
                 llm.ChatMessage.create({
                     role: llm.ChatRole.USER,
-                    text: 'Say "How can I help you today?"',
+                    text: greetingText,
                 }),
             );
 

@@ -80,7 +80,7 @@ const Dashboard = () => {
                     <div>
                         <Card className="h-full">
                             <CardContent>
-                                <VoiceAssistant />
+                                <VoiceAssistant userId={address ?? 'unknown'} />
                             </CardContent>
                             <CardFooter className="border-t pt-4">
                                 <p className="text-xs text-muted-foreground">

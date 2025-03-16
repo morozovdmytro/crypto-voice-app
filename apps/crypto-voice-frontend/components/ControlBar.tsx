@@ -29,7 +29,7 @@ const ControlBar = (props: { onConnectButtonClicked?: () => void; agentState: Ag
                         className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
                     >
                         <VoiceAssistantControlBar controls={{ leave: false }} />
-                        <DisconnectButton>
+                        <DisconnectButton className="bg-red-500 text-white">
                             Close
                         </DisconnectButton>
                     </motion.div>
