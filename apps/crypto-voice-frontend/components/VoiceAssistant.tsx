@@ -2,9 +2,7 @@
 
 import { AgentState, LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import { MediaDeviceFailure } from "livekit-client";
-import { useCallback, useState } from "react";
-import { CreateRoomButton } from "@/components/CreateRoomButton";
-import { Room as RoomType } from "../types/room";
+import { useCallback, useEffect, useState } from "react";
 import VoiceAssistantBars from "@/components/VoiceAssistantBars";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
 import ControlBar from "@/components/ControlBar";
@@ -13,6 +11,8 @@ import Spinner from "./ui/spinner";
 import useSmartContracts from "@/hooks/useSmartContracts";
 import { useBalanceOf } from "@/hooks/useBalanceOf";
 import { formatTokenAmount } from "@/lib/numbers.utils";
+import { useRoomCreation } from "@/hooks/useRoomCreation";
+import { Room as RoomType } from "../types/room";
 
 const VoiceAssistant = ({ userId }: { userId: string }) => {
     const [connectionDetails, setConnectionDetails] = useState<RoomType | undefined>();
@@ -26,21 +26,25 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
         balance: balance ? `${formatTokenAmount(balance)} ${smartContract.ticker}` : `0 ${smartContract.ticker}`
     };
 
+    const { mutate: createRoom, isPending: isCreatingRoom } = useRoomCreation({
+        onSuccess: (data) => {
+            setConnectionDetails(data);
+        },
+    });
+
+    useEffect(() => {
+        if (!connectionDetails && !isCreatingRoom && userData) {
+            createRoom({ userId, userInfo });
+        }
+    }, [userId, userInfo, connectionDetails, isCreatingRoom, userData, createRoom]);
+
     const onDeviceFailure = useCallback((failure?: MediaDeviceFailure) => {
         if (failure) {
             console.error('Device failure:', failure);
         }
     }, []);
 
-    const updateConnectionDetails = (details: RoomType | undefined) => {
-        setConnectionDetails(details);
-    };
-
-    const handleRoomCreated = (room: RoomType) => {
-        updateConnectionDetails(room);
-    };
-
-    const isLoading = status !== 'ready' && status !== 'error' || isBalanceLoading;
+    const isLoading = (status !== 'ready' && status !== 'error') || isBalanceLoading || isCreatingRoom;
 
     return (
         <div className="flex h-[500px] flex-col">
@@ -50,11 +54,8 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
                 </div>
             ) : !connectionDetails ? (
                 <div className="flex justify-center p-8">
-                    <CreateRoomButton
-                        userId={userId}
-                        userInfo={userInfo}
-                        onRoomCreated={handleRoomCreated}
-                    />
+                    <Spinner />
+                    <p className="ml-2">Connecting to voice assistant...</p>
                 </div>
             ) : (
                 <LiveKitRoom
@@ -65,12 +66,14 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
                     video={false}
                     onMediaDeviceFailure={onDeviceFailure}
                     onDisconnected={() => {
-                        updateConnectionDetails(undefined);
+                        setConnectionDetails(undefined);
                     }}
                     className="grid grid-rows-[2fr_1fr] items-center"
                 >
                     <VoiceAssistantBars onStateChange={setAgentState} />
-                    <ControlBar agentState={agentState} />
+                    <div className="flex flex-col items-center justify-center gap-4">
+                        <ControlBar agentState={agentState} />
+                    </div>
                     <RoomAudioRenderer />
                     <NoAgentNotification state={agentState} />
                 </LiveKitRoom>

@@ -18,14 +18,12 @@ export default defineAgent({
             console.log('Waiting for participant');
             const participant = await ctx.waitForParticipant();
             
-            // Access participant metadata and attributes
             const participantMetadata = participant.metadata;
             const participantAttributes = participant.attributes;
             
             console.log('Participant metadata:', participantMetadata);
             console.log('Participant attributes:', participantAttributes);
             
-            // Parse user information from metadata if it exists
             let userInfo = {};
             if (participantMetadata) {
                 try {
