@@ -13,17 +13,20 @@ import { useBalanceOf } from "@/hooks/useBalanceOf";
 import { formatTokenAmount } from "@/lib/numbers.utils";
 import { useRoomCreation } from "@/hooks/useRoomCreation";
 import { Room as RoomType } from "../types/room";
+import { useSmartAccount } from "@/hooks/useSmartAccount";
 
 const VoiceAssistant = ({ userId }: { userId: string }) => {
     const [connectionDetails, setConnectionDetails] = useState<RoomType | undefined>();
     const [agentState, setAgentState] = useState<AgentState>("disconnected");
     const { userData, status } = useUserData();
+    const { address } = useSmartAccount();
     const { smartContract } = useSmartContracts();
     const { balance, loading: isBalanceLoading } = useBalanceOf(smartContract.address as `0x${string}`);
 
     const userInfo = {
         name: userData?.name,
-        balance: balance ? `${formatTokenAmount(balance)} ${smartContract.ticker}` : `0 ${smartContract.ticker}`
+        balance: balance ? `${formatTokenAmount(balance)} ${smartContract.ticker}` : `0 ${smartContract.ticker}`,
+        address
     };
 
     const { mutate: createRoom, isPending: isCreatingRoom } = useRoomCreation({
@@ -33,10 +36,10 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
     });
 
     useEffect(() => {
-        if (!connectionDetails && !isCreatingRoom && userData) {
+        if (!connectionDetails && !isCreatingRoom && userData && address) {
             createRoom({ userId, userInfo });
         }
-    }, [userId, userInfo, connectionDetails, isCreatingRoom, userData, createRoom]);
+    }, [userId, userInfo, connectionDetails, isCreatingRoom, userData, createRoom, address]);
 
     const onDeviceFailure = useCallback((failure?: MediaDeviceFailure) => {
         if (failure) {

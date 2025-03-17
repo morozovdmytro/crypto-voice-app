@@ -8,11 +8,20 @@ const schema = {
 }
 
 const tool = async ({ address }: { address: string }): Promise<CallToolResult> => {
+    const transactionHistory = [
+        {
+            amount: 154,
+            currency: 'SHEF',
+            date: '2021-01-01',
+            type: 'deposit',
+            status: 'completed'
+        },
+    ]
     return {
         content: [
             {
                 type: "text",
-                text: `Transaction history for ${address}`
+                text: `Transaction history for ${address} is: ${JSON.stringify(transactionHistory)}`
             }
         ]
     }
