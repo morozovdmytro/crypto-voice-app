@@ -1,7 +1,7 @@
 'use client';
 
-import { AgentState, LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
-import { MediaDeviceFailure } from "livekit-client";
+import { AgentState, LiveKitRoom, RoomAudioRenderer, useDataChannel } from "@livekit/components-react";
+import { DataPacket_Kind, MediaDeviceFailure } from "livekit-client";
 import { useCallback, useEffect, useState } from "react";
 import VoiceAssistantBars from "@/components/VoiceAssistantBars";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
@@ -49,6 +49,25 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
 
     const isLoading = (status !== 'ready' && status !== 'error') || isBalanceLoading || isCreatingRoom;
 
+    // Create a transaction handler component that will be mounted inside the LiveKitRoom
+    const TransactionHandler = () => {
+        useDataChannel('transaction', (msg) => {
+            console.log('Transaction data received:', msg);
+            try {
+                // Convert the payload to a string (Buffer to string)
+                const payload = new TextDecoder().decode(msg.payload);
+                const data = JSON.parse(payload);
+                if (data) {
+                    console.log('Transaction data received:', data.data);
+                }
+            } catch (error) {
+                console.error('Error parsing transaction data:', error);
+            }
+        });
+
+        return null; // This component doesn't render anything, it just handles the data channel
+    };
+
     return (
         <div className="flex h-[500px] flex-col">
             {isLoading ? (
@@ -79,6 +98,7 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
                     </div>
                     <RoomAudioRenderer />
                     <NoAgentNotification state={agentState} />
+                    <TransactionHandler />
                 </LiveKitRoom>
             )}
         </div>

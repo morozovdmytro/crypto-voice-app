@@ -5,16 +5,18 @@ import { EvmService, PolygonScanService, createLogger } from "../services";
 import { polygon } from "viem/chains";
 import { formatTransactionForDisplay } from "../utils";
 
-const logger = createLogger('TransactionHistoryTool');
+const logger = createLogger('TokenTransactionHistoryTool');
 
-const name = 'transaction_history';
-const description = 'Get the transaction history of a user';
+const name = 'token_transaction_history';
+const description = 'Get the transaction history of a user for a specific token';
 const schema = {
     address: z.string(),
+    contractAddress: z.string(),
+    tokenName: z.string(),
 }
 
-const tool = async ({ address }: { address: string }): Promise<CallToolResult> => {
-    logger.info({ address }, 'Transaction history tool called');
+const tool = async ({ address, contractAddress, tokenName }: { address: string, contractAddress: string, tokenName: string }): Promise<CallToolResult> => {
+    logger.info({ address, contractAddress, tokenName }, 'Token Transaction history tool called');
     
     // TODO: implement dynamic chain selection
     const { service, scanner, nativeCurrency } = {
@@ -37,18 +39,32 @@ const tool = async ({ address }: { address: string }): Promise<CallToolResult> =
             };
         }
 
+        if(!tokenName) {
+            logger.warn({ tokenName }, 'Invalid token name');
+            return {
+                content: [{ type: 'text', text: `Error: Token name is required.` }],
+            };
+        }
+
+        if(!contractAddress.startsWith('0x') || contractAddress.length !== 42) {
+            logger.warn({ contractAddress }, 'Invalid contract address format');
+            return {
+                content: [{ type: 'text', text: `Error: Invalid contract address format. Address should start with '0x' and be 42 characters long.` }],
+            };
+        }
+
         let transactions: Transaction[] = [];
 
         // TODO: implement circuit breaker
         // TODO: implement pagination
         try {
             logger.info({ address }, 'Attempting to fetch transactions via EVM service');
-            transactions = await service.getTransactions(address, 1, 10);
+            transactions = await service.getTokenTransactions(address, contractAddress, 1, 10);
             logger.debug({ count: transactions.length }, 'Transactions fetched via EVM service');
         }
         catch (error) {
             logger.warn({ error }, 'EVM service failed, falling back to PolygonScan');
-            transactions = await scanner.getTransactions(address, 1, 10);
+            transactions = await scanner.getTokenTransactions(address, contractAddress, 1, 10);
             logger.debug({ count: transactions.length }, 'Transactions fetched via PolygonScan service');
         }
 
@@ -65,7 +81,7 @@ const tool = async ({ address }: { address: string }): Promise<CallToolResult> =
         }
 
         // TODO: implement dynamic native currency selection
-        const formattedTransactions = transactions.map(tx => formatTransactionForDisplay(tx, address, nativeCurrency)).join('\n');
+        const formattedTransactions = transactions.map(tx => formatTransactionForDisplay(tx, address, tokenName)).join('\n');
         logger.info({ address, count: transactions.length }, 'Successfully formatted transactions');
 
         return {
@@ -77,7 +93,7 @@ const tool = async ({ address }: { address: string }): Promise<CallToolResult> =
             ]
         };
     } catch (error) {
-        logger.error({ error, address }, 'Error in transaction_history tool');
+        logger.error({ error, address, contractAddress }, 'Error in token_transaction_history tool');
         return {
             content: [
                 {
@@ -89,4 +105,4 @@ const tool = async ({ address }: { address: string }): Promise<CallToolResult> =
     }
 }
 
-export const transactionHistoryTool = { name, description, schema, tool };
+export const tokenTransactionHistoryTool = { name, description, schema, tool };
