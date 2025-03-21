@@ -1,8 +1,8 @@
 'use client';
 
-import { AgentState, LiveKitRoom, RoomAudioRenderer, useDataChannel } from "@livekit/components-react";
-import { DataPacket_Kind, MediaDeviceFailure } from "livekit-client";
-import { useCallback, useEffect, useState } from "react";
+import { AgentState, LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
+import { MediaDeviceFailure, RoomOptions } from "livekit-client";
+import { useCallback, useState } from "react";
 import VoiceAssistantBars from "@/components/VoiceAssistantBars";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
 import ControlBar from "@/components/ControlBar";
@@ -14,32 +14,36 @@ import { formatTokenAmount } from "@/lib/numbers.utils";
 import { useRoomCreation } from "@/hooks/useRoomCreation";
 import { Room as RoomType } from "../types/room";
 import { useSmartAccount } from "@/hooks/useSmartAccount";
+import { Button } from "./ui/button";
+import TransactionHandler from "./TransactionHandler";
+import TransferHandler from "./TransferHandler";
 
-const VoiceAssistant = ({ userId }: { userId: string }) => {
+const VoiceAssistant = () => {
     const [connectionDetails, setConnectionDetails] = useState<RoomType | undefined>();
     const [agentState, setAgentState] = useState<AgentState>("disconnected");
+    const [showStartButton, setShowStartButton] = useState(true);
     const { userData, status } = useUserData();
     const { address } = useSmartAccount();
     const { smartContract } = useSmartContracts();
     const { balance, loading: isBalanceLoading } = useBalanceOf(smartContract.address as `0x${string}`);
 
-    const userInfo = {
-        name: userData?.name,
-        balance: balance ? `${formatTokenAmount(balance)} ${smartContract.ticker}` : `0 ${smartContract.ticker}`,
-        address
-    };
-
     const { mutate: createRoom, isPending: isCreatingRoom } = useRoomCreation({
         onSuccess: (data) => {
             setConnectionDetails(data);
+            setShowStartButton(false);
         },
     });
 
-    useEffect(() => {
-        if (!connectionDetails && !isCreatingRoom && userData && address) {
-            createRoom({ userId, userInfo });
+    const handleStartConversation = () => {
+        if (!isCreatingRoom && userData && address) {
+            const userInfo = {
+                name: userData?.name,
+                balance: balance ? `${formatTokenAmount(balance)} ${smartContract.ticker}` : `0 ${smartContract.ticker}`,
+                address
+            }
+            createRoom({ userId: address, userInfo });
         }
-    }, [userId, userInfo, connectionDetails, isCreatingRoom, userData, createRoom, address]);
+    };
 
     const onDeviceFailure = useCallback((failure?: MediaDeviceFailure) => {
         if (failure) {
@@ -47,37 +51,50 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
         }
     }, []);
 
-    const isLoading = (status !== 'ready' && status !== 'error') || isBalanceLoading || isCreatingRoom;
-
-    // Create a transaction handler component that will be mounted inside the LiveKitRoom
-    const TransactionHandler = () => {
-        useDataChannel('transaction', (msg) => {
-            console.log('Transaction data received:', msg);
-            try {
-                // Convert the payload to a string (Buffer to string)
-                const payload = new TextDecoder().decode(msg.payload);
-                const data = JSON.parse(payload);
-                if (data) {
-                    console.log('Transaction data received:', data.data);
-                }
-            } catch (error) {
-                console.error('Error parsing transaction data:', error);
-            }
-        });
-
-        return null; // This component doesn't render anything, it just handles the data channel
+    const roomOptions: RoomOptions = {
+        adaptiveStream: true,
+        dynacast: true,
+        publishDefaults: {
+            simulcast: false,
+            stopMicTrackOnMute: false
+        },
+        audioCaptureDefaults: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        }
     };
 
+    const isLoading = (status !== 'ready' && status !== 'error') || isBalanceLoading;
+
     return (
-        <div className="flex h-[500px] flex-col">
+        <div className="flex flex-col h-full min-h-[400px] sm:min-h-[450px] md:min-h-[500px] w-full">
             {isLoading ? (
-                <div className="flex justify-center p-8">
-                    <Spinner />
+                <div className="flex justify-center items-center flex-grow p-4">
+                    <Spinner color="main" size="large"/>
+                </div>
+            ) : showStartButton ? (
+                <div className="flex flex-col items-center justify-center gap-4 h-full">
+                    <h3 className="text-lg sm:text-xl font-medium text-center px-2">Ready to start your crypto conversation?</h3>
+                    <Button 
+                        onClick={handleStartConversation} 
+                        disabled={isCreatingRoom}
+                        className="px-4 sm:px-6 py-2 text-base sm:text-lg"
+                    >
+                        {isCreatingRoom ? (
+                            <>
+                                <Spinner color="white" size="small" className="mr-2" />
+                                Connecting...
+                            </>
+                        ) : (
+                            "Start Conversation"
+                        )}
+                    </Button>
                 </div>
             ) : !connectionDetails ? (
-                <div className="flex justify-center p-8">
-                    <Spinner />
-                    <p className="ml-2">Connecting to voice assistant...</p>
+                <div className="flex justify-center items-center flex-grow p-4">
+                    <Spinner color="main" size="large"/>
+                    <p className="ml-2 text-sm sm:text-base">Connecting to voice assistant...</p>
                 </div>
             ) : (
                 <LiveKitRoom
@@ -86,19 +103,22 @@ const VoiceAssistant = ({ userId }: { userId: string }) => {
                     connect={connectionDetails !== undefined}
                     audio={true}
                     video={false}
+                    options={roomOptions}
                     onMediaDeviceFailure={onDeviceFailure}
                     onDisconnected={() => {
                         setConnectionDetails(undefined);
+                        setShowStartButton(true);
                     }}
-                    className="grid grid-rows-[2fr_1fr] items-center"
+                    className="grid grid-rows-[2fr_1fr] items-center h-full w-full"
                 >
                     <VoiceAssistantBars onStateChange={setAgentState} />
-                    <div className="flex flex-col items-center justify-center gap-4">
+                    <div className="flex flex-col items-center justify-center gap-2 sm:gap-4 w-full">
                         <ControlBar agentState={agentState} />
                     </div>
                     <RoomAudioRenderer />
                     <NoAgentNotification state={agentState} />
                     <TransactionHandler />
+                    <TransferHandler />
                 </LiveKitRoom>
             )}
         </div>

@@ -17,6 +17,7 @@ export const useBalanceOf = (tokenAddress: `0x${string}`) => {
       setLoading(false);
     }
     catch(err) {
+      console.error("Error fetching token balance:", err);
       setBalance(null);
       setLoading(false);
     }
@@ -27,5 +28,5 @@ export const useBalanceOf = (tokenAddress: `0x${string}`) => {
     fetchBalance();
   }, [tokenAddress, address, provider]);
 
-  return { balance, loading };
+  return { balance, loading, fetchBalance };
 };

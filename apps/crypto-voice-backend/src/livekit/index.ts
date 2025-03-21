@@ -3,3 +3,4 @@ export * from '../constants.js';
 export * from './livekit-room-manager.js';
 export * from './livekit-initializer.js';
 export * from './livekit-agent.js';
+export * from './livekit.service.js';

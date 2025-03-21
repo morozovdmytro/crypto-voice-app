@@ -1,11 +1,11 @@
 'use client';
 
 import BalanceCard from "@/components/BalanceCard";
-import { CardContent, CardFooter } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Clock, LogOut, Wallet } from "lucide-react";
+import { LogOut, Wallet } from "lucide-react";
 import TransactionHistory from "@/components/TransactionHistory";
 import VoiceAssistant from "@/components/VoiceAssistant";
 import { useSmartAccount } from "@/hooks/useSmartAccount";
@@ -34,12 +34,12 @@ const Dashboard = () => {
 
     return (
         <div className="flex min-h-screen flex-col">
-            <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-                <div className="flex items-center justify-between space-y-2">
-                    <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                    <div className="flex items-center space-x-2">
+            <div className="flex-1 space-y-4 p-3 sm:p-4 md:p-8 pt-4 sm:pt-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
+                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-accent-main">Dashboard</h2>
+                    <div className="flex flex-wrap items-center gap-2 sm:space-x-2">
                         {isUserDataReady && userData && (
-                            <Avatar>
+                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                                 <AvatarImage src={userData.picture} />
                                 <AvatarFallback>
                                     {userData.name.charAt(0)}
@@ -47,29 +47,31 @@ const Dashboard = () => {
                             </Avatar>
                         )}
                         {isSmartAccountReady && address ? (
-                            <Button variant="outline" onClick={() => explorerLink && window.open(explorerLink, '_blank')}>
-                                <Wallet className="mr-2 h-4 w-4" />
+                            <Button variant="outline" 
+                                className="text-xs sm:text-sm"
+                                onClick={() => explorerLink && window.open(explorerLink, '_blank')}>
+                                <Wallet className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                                 {displayAddress}
                             </Button>
                         ) : (
-                            <Button disabled>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <Spinner className="h-4 w-4" />
+                            <Button disabled className="text-xs sm:text-sm">
+                                <Wallet className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                <Spinner className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                         )}
-                        <Button onClick={handleLogout} className="bg-red-500 hover:bg-red-600">
-                            <LogOut className="mr-2 h-4 w-4" />
+                        <Button onClick={handleLogout} 
+                            className="bg-secondary hover:bg-secondary/80 text-xs sm:text-sm">
+                            <LogOut className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                             Logout
                         </Button>
                     </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 w-full">
                         <BalanceCard />
-
-                        <Card>
+                        <Card className="bg-mid shadow-xl w-full">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle>Recent Transactions</CardTitle>
+                                <CardTitle className="text-base sm:text-lg md:text-xl">Recent Transactions</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <TransactionHistory />
@@ -77,16 +79,11 @@ const Dashboard = () => {
                         </Card>
                     </div>
 
-                    <div>
-                        <Card className="h-full">
-                            <CardContent>
-                                <VoiceAssistant userId={address ?? 'unknown'} />
+                    <div className="w-full">
+                        <Card className="h-full bg-mid shadow-xl w-full">
+                            <CardContent className="p-3 sm:p-6">
+                                <VoiceAssistant />
                             </CardContent>
-                            <CardFooter className="border-t pt-4">
-                                <p className="text-xs text-muted-foreground">
-                                    Try saying: "Show me my Bitcoin balance" or "What's the trend for Ethereum?"
-                                </p>
-                            </CardFooter>
                         </Card>
                     </div>
                 </div>

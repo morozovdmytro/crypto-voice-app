@@ -11,12 +11,12 @@ const VoiceAssistantBars = (props: { onStateChange: (state: AgentState) => void 
     }, [props, state]);
 
     return (
-        <div className="h-[300px] max-w-[90vw] mx-auto">
+        <div className="w-full h-[220px] sm:h-[250px] md:h-[300px]">
             <BarVisualizer
                 state={state}
                 barCount={5}
                 trackRef={audioTrack}
-                className="agent-visualizer"
+                className="agent-visualizer w-full h-full"
                 options={{ minHeight: 24 }}
             />
         </div>

@@ -6,7 +6,7 @@ export const formatTransactionForDisplay = (tx: Transaction, owner: string, nati
     const valueInNativeCurrency = tx.tokenName && tx.tokenDecimal ? parseFloat(tx.value) / 10 ** parseInt(tx.tokenDecimal) : parseFloat(tx.value) / 1e18;
 
     return `
-        - Type: ${tx.from === owner ? 'Outgoing' : 'Incoming'}
+        - Type: ${tx.to?.toLowerCase() === owner.toLowerCase() ? 'Incoming' : 'Outgoing'}
         Value: ${valueInNativeCurrency.toFixed(6)} ${nativeCurrency}
         Time: ${timestamp}
         Status: ${status}

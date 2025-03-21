@@ -32,7 +32,7 @@ export default function DashboardLayout({
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <Spinner />
+                <Spinner color="main" size="large"/>
             </div>
         );
     }

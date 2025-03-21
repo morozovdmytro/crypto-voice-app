@@ -1,37 +1,36 @@
 module.exports = {
   colors: {
-    'accent-main': 'var(--cdfd-theme-accent-main)',
-    'accent-secondary': 'var(--cdfd-theme-accent-secondary)',
-    'accent-tertiary': 'var(--cdfd-theme-accent-tertiary)',
+    'accent-main': '#FE4A2A',
+    'accent-secondary': '#FCA292',
+    'accent-tertiary': '#FBD7D0',
 
-    'bg-low': 'var(--cdfd-theme-bg-low)',
-    'bg-mid': 'var(--cdfd-theme-bg-mid)',
-    'bg-high': 'var(--cdfd-theme-bg-high)',
+    'background': '#EFEFF4',
+    'mid': '#F9F9FE',
+    'high': '#FFFFFF',
 
-    'text-accent': 'var(--cdfd-theme-text-accent)',
-    'text-main': 'var(--cdfd-theme-text-main)',
-    'text-secondary': 'var(--cdfd-theme-text-secondary)',
-    'text-tertiary': 'var(--cdfd-theme-text-tertiary)',
+    'accent': '#FFFFFF',
+    'foreground': '#1C1E1D',
+    'secondary': '#3B3B3B',
+    'tertiary': '#A6A6A6',
 
-    'success-main': 'var(--cdfd-theme-success-main)',
-    'success-secondary': 'var(--cdfd-theme-success-secondary)',
+    'success-main': '#50AF95',
+    'success-secondary': '#DCEDEA',
 
-    'warning-main': 'var(--cdfd-theme-warning-main)',
-    'warning-secondary': 'var(--cdfd-theme-warning-secondary)',
+    'warning-main': '#F7A401',
+    'warning-secondary': '#FDEACC',
 
-    'error-main': 'var(--cdfd-theme-error-main)',
-    'error-secondary': 'var(--cdfd-theme-error-secondary)',
+    'destructive': '#DB1E40',
+    'destructive-secondary': '#FADBE2',
 
-    'info-main': 'var(--cdfd-theme-info-main)',
-    'info-secondary': 'var(--cdfd-theme-info-secondary)',
+    'info-main': '#5989E6',
+    'info-secondary': '#DEE5FA',
 
-    border: 'var(--cdfd-theme-border)',
+    border: '#DDDDDD',
   },
   borderRadius: {
-    inner: 'var(--cdfd-theme-radius-inner)',
-    normal: 'var(--cdfd-theme-radius-normal)',
-    outer: 'var(--cdfd-theme-radius-outer)',
-    brand: '0rem',
+    inner: '2px',
+    normal: '2px',
+    outer: '2px',
   },
   boxShadow: {
     frame: 'inset 0 0 1px 0',

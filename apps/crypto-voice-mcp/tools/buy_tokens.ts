@@ -2,12 +2,12 @@ import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { ClaimDropService, createLogger } from "../services";
 import { polygon } from "viem/chains";
-import { formatUnits, parseUnits } from "viem";
+import { parseUnits } from "viem";
 
 const logger = createLogger('BuyTokensTool');
 
 const name = 'buy_tokens';
-const description = 'User can request to buy tokens. This tool will generate necessary transaction data and send it to the client via data channel.';
+const description = 'Generates transaction data for token purchase';
 
 const schema = {
     address: z.string(),
@@ -33,21 +33,28 @@ const tool = async ({ address, tokenAmount, tokenName, saleTokenAddress }: {
         if (!address.startsWith('0x') || address.length !== 42) {
             logger.warn({ address }, 'Invalid address format');
             return {
-                content: [{ type: 'text', text: `Error: Invalid address format. Address should start with '0x' and be 42 characters long.` }],
+                content: [{ type: 'text', text: `Invalid wallet address. Please provide a valid address.` }],
+            };
+        }
+
+        if (!saleTokenAddress || !saleTokenAddress.startsWith('0x') || saleTokenAddress.length !== 42) {
+            logger.warn({ saleTokenAddress }, 'Invalid saleTokenAddress format');
+            return {
+                content: [{ type: 'text', text: `Invalid token contract address. Please provide a valid address.` }],
             };
         }
 
         if (tokenAmount <= 0) {
             logger.warn({ tokenAmount }, 'Invalid token amount');
             return {
-                content: [{ type: 'text', text: `Error: Token amount must be greater than 0.` }],
+                content: [{ type: 'text', text: `Token amount must be greater than 0.` }],
             };
         }
 
         if (!tokenName) {
             logger.warn({ tokenName }, 'Invalid token name');
             return {
-                content: [{ type: 'text', text: `Error: Token name is required.` }],
+                content: [{ type: 'text', text: `Please specify a token name.` }],
             };
         }
 
@@ -67,14 +74,14 @@ const tool = async ({ address, tokenAmount, tokenName, saleTokenAddress }: {
             content: [
                 {
                     type: 'text',
-                    text: 'Transaction data generated successfully. Please confirm the transaction and send it to the blockchain.',
+                    text: `Ready to purchase ${tokenAmount} ${tokenName}. Please confirm the transaction.`,
                 }
             ],
         };
     } catch (error) {
         logger.error({ error }, 'Error buying tokens');
         return {
-            content: [{ type: 'text', text: `Error buying tokens: ${error}` }],
+            content: [{ type: 'text', text: `Unable to process purchase. Please try again.` }],
         };
     }
 };

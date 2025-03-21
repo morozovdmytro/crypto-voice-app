@@ -15,7 +15,17 @@
   @apply border-t-0 p-0 h-min mr-4;
 }
 
+.lk-device-menu {
+  background-color: #FFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
 
+.lk-disconnect-button {
+  border-radius: 6px;
+}
 
 @layer base {
   :root {

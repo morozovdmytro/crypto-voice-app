@@ -25,24 +25,12 @@ export class ClaimDropService {
         try {
             logger.info({ address, claimConditionId }, 'Fetching claim condition');
             
-            // Create a promise that will timeout after 10 seconds
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Contract read operation timed out')), 10000);
-            });
-            
-            // Create the contract read promise
-            const contractReadPromise = this.publicClient.readContract({
+            const claimCondition = await this.publicClient.readContract({
                 address: address as `0x${string}`,
                 abi: ClaimDropAbi,
                 functionName: 'getClaimConditionById',
                 args: [claimConditionId]
             });
-            
-            // Race the promises - whichever resolves/rejects first wins
-            const claimCondition = await Promise.race([
-                contractReadPromise,
-                timeoutPromise
-            ]);
 
             logger.info({ claimCondition }, 'Claim condition fetched');
 

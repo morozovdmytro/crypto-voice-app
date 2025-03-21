@@ -4,7 +4,7 @@ import { LivekitModule } from './livekit/livekit.module.js';
 import { HealthController, RoomController } from './controllers/index.js';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true}), LivekitModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), LivekitModule],
   controllers: [HealthController, RoomController],
   providers: [],
 })

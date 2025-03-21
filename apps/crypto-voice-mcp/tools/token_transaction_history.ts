@@ -80,6 +80,7 @@ const tool = async ({ address, contractAddress, tokenName }: { address: string, 
             };
         }
 
+        logger.info({ transactions }, 'Transactions');
         // TODO: implement dynamic native currency selection
         const formattedTransactions = transactions.map(tx => formatTransactionForDisplay(tx, address, tokenName)).join('\n');
         logger.info({ address, count: transactions.length }, 'Successfully formatted transactions');

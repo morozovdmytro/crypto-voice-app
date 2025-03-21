@@ -1,3 +1,3 @@
 export interface Initializer {
-    initialize(): Promise<void>;
+  initialize(): Promise<void>;
 }

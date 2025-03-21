@@ -15,7 +15,8 @@ const spinnerVariants = cva('', {
       light: 'border-gray-100 text-gray-100',
       white: 'border-white text-white',
       black: 'border-black text-black',
-      yellow: 'border-brand--1 text-brand--4'
+      yellow: 'border-brand--1 text-brand--4',
+      main: 'border-accent-secondary text-accent-main'
     },
     strokeWidth: {
       small: 'border-1',

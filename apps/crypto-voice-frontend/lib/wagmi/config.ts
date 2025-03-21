@@ -10,6 +10,7 @@ export const config = getDefaultConfig({
   appUrl: 'https://codefunded.com',
   ssr: true,
   projectId: env.NEXT_PUBLIC_PROJECT_ID ?? '',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chains: CHAINS as any,
   transports: {
     [polygon.id]: http(),

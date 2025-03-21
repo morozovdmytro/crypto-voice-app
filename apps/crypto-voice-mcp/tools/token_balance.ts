@@ -47,8 +47,6 @@ const tool = async ({ address, contractAddress, tokenName, decimals }: { address
             };
         }
         
-        
-
         let balance = 0n;
 
         try {

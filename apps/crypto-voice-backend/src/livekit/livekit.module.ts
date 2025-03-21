@@ -1,6 +1,7 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { LivekitRoomManager } from './livekit-room-manager.js';
 import { LivekitInitializer } from './livekit-initializer.js';
+import { LivekitService } from './livekit.service.js';
 import { ROOM_MANAGER_TOKEN } from '../constants.js';
 import { ConfigModule } from '@nestjs/config';
 
@@ -11,28 +12,18 @@ import { ConfigModule } from '@nestjs/config';
     LivekitRoomManager,
     {
       provide: ROOM_MANAGER_TOKEN,
-      useClass: LivekitRoomManager
+      useClass: LivekitRoomManager,
     },
-    LivekitInitializer
+    LivekitInitializer,
+    LivekitService,
   ],
   exports: [
     {
       provide: ROOM_MANAGER_TOKEN,
-      useClass: LivekitRoomManager
+      useClass: LivekitRoomManager,
     },
-    LivekitInitializer
+    LivekitInitializer,
+    LivekitService,
   ],
 })
-export class LivekitModule implements OnModuleInit {
-  constructor(private readonly initializer: LivekitInitializer) {
-  }
-
-  async onModuleInit() {
-    try {
-      await this.initializer.initialize();
-    } catch (error) {
-      console.error('Error initializing Livekit:', error);
-      throw error;
-    }
-  }
-}
+export class LivekitModule {}

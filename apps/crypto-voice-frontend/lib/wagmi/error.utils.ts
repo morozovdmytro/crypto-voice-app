@@ -24,7 +24,8 @@ import {
       if (!wagmiError) {
         return error.shortMessage;
       }
-      let reason = wagmiError?.reason ?? wagmiError?.data?.errorName;
+      
+      const reason = wagmiError?.reason ?? wagmiError?.data?.errorName;
   
       switch (reason) {
         case '!PriceOrCurrency':
@@ -52,6 +53,7 @@ import {
   };
   
   function isWagmiErrorType(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     error: any,
   ): error is WaitForTransactionReceiptErrorType | WriteContractErrorType {
     return 'message' in error;

@@ -12,8 +12,8 @@ import { ArrowRight, Loader2, Chrome } from "lucide-react";
 import { useWeb3Auth } from "@/hooks/useWeb3Auth";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/spinner";
+import Image from "next/image";
 
-// Define the login schema
 const loginSchema = z.object({
   provider: z.enum(["google"])
 });
@@ -39,7 +39,7 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginFormValues) {
     if (status === 'initializing') return;
-    
+
     try {
       switch (data.provider) {
         case "google":
@@ -67,15 +67,17 @@ export default function LoginPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Spinner />
+        <Spinner color="main" size="large"/>
       </div>
     );
   }
 
   return (
-    <Card className="w-full max-w-md shadow-xl">
+    <Card className="w-full max-w-md shadow-xl bg-mid">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center flex justify-center items-center">
+          <Image width="120" src="/codefunded-signet.svg" height="120" alt='codefunded' />
+        </CardTitle>
         <CardDescription className="text-center">
           Sign in to your account using your preferred method
         </CardDescription>
@@ -86,12 +88,12 @@ export default function LoginPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-between"
+              className="w-full flex items-center justify-between hover:bg-accent-main hover:text-white"
               disabled={isLoading}
               onClick={() => handleProviderLogin("google")}
             >
               <div className="flex items-center">
-                <Chrome className="mr-2 h-5 w-5 text-blue-500" />
+                <Chrome className="mr-2 h-5 w-5 text-accent-main hover:text-white" />
                 <span>Continue with Google</span>
               </div>
               {isLoading ? (
