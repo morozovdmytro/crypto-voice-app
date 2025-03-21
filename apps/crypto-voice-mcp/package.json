@@ -18,13 +18,19 @@
     "build": "tsc && shx chmod +x dist/*.js",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "dev": "nodemon --watch './**/*.ts' --exec 'yarn build && yarn start'"
   },
   "bin": {
     "mcp-server-crypto-voice": "dist/index.js"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "nodemon": "^3.0.1",
     "shx": "^0.3.4",
     "typescript": "^5.7.3"
   }

@@ -10,5 +10,5 @@ export const formatTransactionForDisplay = (tx: Transaction, owner: string, nati
         Value: ${valueInNativeCurrency.toFixed(6)} ${nativeCurrency}
         Time: ${timestamp}
         Status: ${status}
-    `;
+    `; 
 }
